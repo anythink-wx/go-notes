@@ -215,15 +215,86 @@ str := "hell" + "o wor" +
 
 **多字符串拼接换行，需要把加号放置到前面**
 
+### 指针
+
+指针类型，存储的是变量所在内存的地址。通过& 获取变量的指针（内存地址），通过*int 类型变量保存指针，通过 \* 变量，获取指针指向的变量原值。
+
+```go
+var i int = 23333333
+fmt.Print("i=", &i) //i=0xc000014090
+
+//定义了一个变量， 类型是 *int  代表指向了一个int类型的指针
+var ptr *int = &i
+fmt.Println("ptr=", ptr) //ptr=0xc000014090
+//指针变量也有自己的内存地址，可以通过&查看指针变量的地址
+fmt.Println("ptr的地址=", &ptr) //ptr的地址= 0xc000100020
+fmt.Println("ptr指向的i值=", *ptr) //ptr指向的i值= 23333333
+
+//通过指针修改变量i的值
+*ptr = 100
+fmt.Println("new i=", i)
+
+```
+
+- 所有的值类型，都有对应的指针类型，形式为\*数据类型，比如int的指针就是*int，float32对应的指针类型就是*float32。
+
+- 值类型包括，基本数据类型，int系列，float系列，bool，string，**数组**和**结构体 struct**。
+
+### 值类型和引用类型
+
+1. 值类型，基本数据类型 int系列，float系列，bool，string，数组和结构体struct
+
+   ​	值类型，变量直接存储至，内存通常在栈中分配
+
+2. 引用类型，指针，slice切片，map，管道chan，interface等都是引用类型
+
+   ​	变量存储的是地址，内幕才能通常在堆上分配，当没有任何引用时，该地址对应的数据空间就变成垃圾，由GC来回收
+
+
+
+### 标识符的命名规范
+
+变量，方法，函数等命名时使用的字符序列，称为标识符
+
+命名规则
+
+1. 英文字母，大小写，数字，下划线
+
+2. 数字不能开头
+
+3. 不能包含空格
+
+4. 大小写敏感
+
+5. 下划线是go的特殊标识符，称为空标识符，仅作为占位符，不能使用
+
+6. 保留字25个关键字不能用 break，default，func，interface，select，case，defer，go，map，struct，chan，else，goto，package，switch，const，fallthrough，if，range，type，continue，for，import，return，var
+
+7. 预定义标识符，其中包含基础数据类型，和系统内嵌函数
+
+   append，bool，byte，cap，close，complex，complex64，complex128，uint16，copy，false，float32，float64，imag，int，int8，int16，int32，int64，iota，len，make，new，nil，panic，uint64，print，println，real，recover，string，true，uint，uint8，uintprt。
+
+**标识符命名注意事项**
+
+1. 尽量要求包名和文件夹名称保持一致,简短有意义，不要和标准库冲突
+2. 变量名，常量名，函数名，采用驼峰法。举例 stuName
+3. 如果变量名，函数名，常量名，首字母大写，则可以被其他的包访问；如果是小写，则只能在本包中使用。
+
+
+
 ## 基本数据类型默认值
 
 ```go
 var a int //0
 var b float32 //0.000000
 var c float64 //0.000000
-	var isBool bool // false
-	var name string // ""
+var isBool bool // false
+var name string // ""
 ```
+
+
+
+
 
 ## 数据类型转换
 
@@ -342,10 +413,6 @@ n, _ = strconv.ParseBool(str)
 fmt.Printf("type %T  str=%v", n, n) //type bool  str=false
 
 ```
-
-
-
-
 
 
 
