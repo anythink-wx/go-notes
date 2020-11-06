@@ -12,6 +12,35 @@ go主线程（或主进程），可以起多个协程，协程是轻量级的线
 
 协程是轻量级的线程(可以轻松可以开启上万个协程，其他的编程语言基于线程，开启过多线程资源耗费大)
 
+## 异常处理
+
+协程内出现panic使用recover进行处理，避免整个程序崩溃
+
+```go
+func TestH5(t *testing.T) {
+
+   go func() {
+      for i := 0; i <= 10; i++ {
+         time.Sleep(time.Second)
+         fmt.Println("hello", i)
+      }
+   }()
+
+   go func() {
+      defer func() {
+         if err := recover(); err != nil {
+            fmt.Println("err", err) //使用recover 来处理
+         }
+
+      }()
+      var mmp map[int]string
+      mmp[0] = "golang" //这里没有make 会报空指针异常 导致程序全部退出
+      fmt.Println("hello mmp")
+   }()
+   time.Sleep(time.Second * 10)
+}
+```
+
 ### 设置运行的cpu数
 
 ```go
@@ -257,6 +286,53 @@ func TestH2(t *testing.T) {
 
    for _ = range resultChan { //最后在主线程等待并收集所有的结果
       //fmt.Println(v)
+   }
+}
+```
+
+### 单向管道
+
+```go
+var chW chan<- int //声明一个只写的chan
+chW<- 20
+num := <-chW //编译错误： 无效运算: <-chW(从仅发送类型 chan<- int 接收)
+
+var chR <-chan int
+r := chR
+chR <- 1 //编译错误：无效运算: chR <- 1(发送到仅接收类型<-chan int)
+```
+
+```go
+func send (ch chan<- int) {} //例如 send 只写
+func recv(ch <-chan  int){} //recv 只读 避免误操作
+```
+
+### 多管道读
+
+```go
+func TestH4(t *testing.T) {
+   //使用select 解决管道读取阻塞问题
+
+   ch1 := make(chan int, 10)
+   ch2 := make(chan string,5)
+
+   for i := 0; i < 10; i++ {
+      ch1 <- i
+   }
+
+   for i := 0; i < 5; i++ {
+      ch2 <- "hello " + fmt.Sprintf("%d",i)
+   }
+
+   for {
+      select { //多个管道可以随机选择一个有数据的读取
+      case a := <-ch1:
+         fmt.Println(a)
+      case b := <-ch2:
+         fmt.Println(b)
+      default:
+         time.Sleep(time.Second)
+      }
    }
 }
 ```
